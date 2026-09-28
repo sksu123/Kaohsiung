@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>대만 가오슝 3박 4일 여행 가이드</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body { font-family: 'Pretendard', sans-serif; background-color: #f3f4f6; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        .tab-btn.active { color: #2563eb; border-bottom-width: 3px; border-color: #2563eb; font-weight: 700; background-color: #eff6ff; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .timeline-line::before { content: ''; position: absolute; left: 4.5rem; top: 0; bottom: 0; width: 2px; background-color: #e2e8f0; z-index: 0; }
+        
+        /* Map Custom Styles */
+        .leaflet-container { z-index: 10 !important; font-family: 'Pretendard', sans-serif; }
+        .map-container { height: 220px; width: 100%; border-radius: 0.75rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .custom-number-marker {
+            background-color: #2563eb;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .marker-badge { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background-color: #2563eb; color: white; font-size: 11px; font-weight: bold; margin-right: 6px; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased">
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl relative pb-10">
+        
+        <!-- Header -->
+        <header class="bg-blue-600 text-white p-5 sticky top-0 z-50 shadow-md">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">가오슝 3박 4일</h1>
+                    <p class="text-sm text-blue-100 mt-1">2026. 10. 02 ~ 10. 05</p>
+                </div>
+                <div class="text-right">
+                    <span class="bg-blue-800 text-xs py-1 px-2 rounded-full font-semibold">총 9명</span>
+                    <p class="text-xs text-blue-100 mt-1">부부 4쌍 + 초등 1명</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <nav class="flex overflow-x-auto bg-white border-b sticky top-[84px] z-40 text-sm whitespace-nowrap shadow-sm" id="tabs">
+            <button onclick="showTab('day1', this)" class="tab-btn active flex-1 py-3 px-4 text-center text-gray-500 transition-colors">10/2 (금)</button>
+            <button onclick="showTab('day2', this)" class="tab-btn flex-1 py-3 px-4 text-center text-gray-500 transition-colors">10/3 (토)</button>
+            <button onclick="showTab('day3', this)" class="tab-btn flex-1 py-3 px-4 text-center text-gray-500 transition-colors">10/4 (일)</button>
+            <button onclick="showTab('day4', this)" class="tab-btn flex-1 py-3 px-4 text-center text-gray-500 transition-colors">10/5 (월)</button>
+            <button onclick="showTab('tips', this)" class="tab-btn flex-1 py-3 px-4 text-center text-gray-500 transition-colors">가이드&꿀팁</button>
+        </nav>
+
+        <!-- Content Area -->
+        <main class="p-4 relative">
+            
+            <!-- Day 1 -->
+            <div id="day1" class="tab-content active timeline-line">
+                <!-- Day 1 Map -->
+                <div class="relative z-10 mb-6">
+                    <h2 class="text-sm font-bold text-gray-700 mb-2"><i class="fa-solid fa-route text-blue-500 mr-1"></i> 1일차 이동 동선</h2>
+                    <div id="map-day1" class="map-container"></div>
+                </div>
+
+                <div class="space-y-8 relative z-10">
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">12:05</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">1</span> 가오슝으로 출발</h3>
+                            <p class="text-sm text-gray-600 mt-1">인천공항 이륙 (14:00 가오슝 공항 도착 및 입국심사)</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>호텔로 이동: <span class="text-gray-600 font-normal">9인승 밴(사전예약) 또는 우버 XL+일반 (약 30~40분)</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">16:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">2</span> 호텔 체크인</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Taiwan+Khan+Hotel+Kaohsiung" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-800 mt-1">Taiwan Khan Hotel (미려도역)</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>식당으로 이동: <span class="text-gray-600 font-normal">도보 15분(950m) 또는 택시 3대</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">18:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">3</span> 희원천채소홀 (저녁)</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=喜園川菜小吃+No.+208,+Datong+1st+Rd,+Qianjin+District,+Kaohsiung+City" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm font-semibold text-gray-800 mt-1">현지인들이 즐겨찾는 사천요리 전문점</p>
+                            <div class="mt-2 text-sm text-gray-600">
+                                <p><i class="fa-solid fa-utensils text-gray-400 w-4"></i> 마파두부, 쿵파오치킨, 볶음밥 등</p>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>유람선으로 이동: <span class="text-gray-600 font-normal">도보 15분 또는 우버 2~3대(약 5분)</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">19:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">4</span> 아이허 유람선</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Love+River+Kaohsiung" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">강변 산책 및 낭만적인 야경 유람선 탑승</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>야시장으로 이동: <span class="text-gray-600 font-normal">전철 13분 또는 택시 3대(약 7분)</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">20:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">5</span> 리우허 야시장</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Liuhe+Night+Market" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">파파야 우유, 해산물, 지파이 등 먹거리.</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>호텔로 복귀: <span class="text-gray-600 font-normal">도보 5~10분 (미려도역 근처)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 2 -->
+            <div id="day2" class="tab-content timeline-line">
+                <!-- Day 2 Map -->
+                <div class="relative z-10 mb-6">
+                    <h2 class="text-sm font-bold text-gray-700 mb-2"><i class="fa-solid fa-route text-blue-500 mr-1"></i> 2일차 이동 동선</h2>
+                    <div id="map-day2" class="map-container"></div>
+                </div>
+
+                <div class="space-y-8 relative z-10">
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">10:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">1</span> 보얼 예술 특구</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Pier-2+Art+Center" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">써니힐 방문(펑리수&우롱차 무료 제공). 예술 단지.</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>영국영사관 이동: <span class="text-gray-600 font-normal">경전철(LRT) 하마센역 하차 또는 택시 3대</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">11:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">2</span> 영국 영사관</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Former+British+Consulate+at+Takao" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">언덕 위에 위치한 붉은 벽돌 건물. 탁 트인 바다 전망.</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>치진섬으로 이동: <span class="text-gray-600 font-normal">도보 10분 후 구산 선착장에서 페리 탑승</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">13:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">3</span> 기후해산 (점심)</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=No.+31,+Miaoqian+Rd,+Qijin+District,+Kaohsiung+City" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">치진섬 내 유명 해산물 식당. 오징어튀김, 새우찜 추천.</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>빙수집으로 이동: <span class="text-gray-600 font-normal">페리 복귀 후 도보 2분</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">15:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">4</span> 하이즈빙 빙수</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Hai+Zhi+Bing+Kaohsiung" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">거대 과일/망고 빙수. (9명 기준 2그릇 추천)</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>식당(후덕복) 이동: <span class="text-gray-600 font-normal">우버/택시 3대 (약 15분)</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">19:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">5</span> 후덕복 (저녁)</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Hou+De+Fu+Kaohsiung" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">딤섬 및 면류 가성비 맛집.</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>호텔로 복귀: <span class="text-gray-600 font-normal">우버/택시 3대 또는 전철</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 3 -->
+            <div id="day3" class="tab-content timeline-line">
+                <!-- Day 3 Map -->
+                <div class="relative z-10 mb-6">
+                    <h2 class="text-sm font-bold text-gray-700 mb-2"><i class="fa-solid fa-route text-blue-500 mr-1"></i> 3일차 이동 동선</h2>
+                    <div id="map-day3" class="map-container"></div>
+                </div>
+
+                <div class="space-y-8 relative z-10">
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">09:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">1</span> 현지식 아침 식사</h3>
+                            <p class="text-sm text-gray-600 mt-1">미려도역 근처 <strong>라오지앙 홍차 뉴나이</strong> (토스트&밀크티).</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>연지담으로 이동: <span class="text-gray-600 font-normal">우버/택시 3대 필수 (약 20분)</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">10:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">2</span> 연지담 (용호탑)</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Lotus+Pond+Kaohsiung" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">거대한 호수를 둘러싼 사원들.</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>점심 식당 이동: <span class="text-gray-600 font-normal">도보 10~15분</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">12:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">3</span> 삼우 우육면</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=San+Niu+Beef+Noodles" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">연지담 근처 인기 우육면 맛집.</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>저녁 장소로 이동: <span class="text-gray-600 font-normal">휴식 후 루이펑(택시 10분)</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">19:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">4</span> 저녁 식사 (야시장)</h3>
+                            <div class="mt-2 text-sm text-gray-600 space-y-3">
+                                <div class="bg-white p-3 rounded border">
+                                    <h4 class="font-bold text-gray-800">루이펑 야시장</h4>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=Ruifeng+Night+Market" target="_blank" class="text-blue-500 block mt-1"><i class="fa-solid fa-map-location-dot"></i> 지도보기</a>
+                                </div>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>호텔로 복귀: <span class="text-gray-600 font-normal">택시 또는 전철 이동</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Day 4 -->
+            <div id="day4" class="tab-content timeline-line">
+                <!-- Day 4 Map -->
+                <div class="relative z-10 mb-6">
+                    <h2 class="text-sm font-bold text-gray-700 mb-2"><i class="fa-solid fa-route text-blue-500 mr-1"></i> 4일차 이동 동선</h2>
+                    <div id="map-day4" class="map-container"></div>
+                </div>
+
+                <div class="space-y-8 relative z-10">
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">10:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">1</span> 까르푸 쇼핑</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Carrefour+Aihe+Store+No.+356,+Hedong+Rd,+Sanmin+District,+Kaohsiung+City" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">귀국 전 지인 선물 및 기념품 쇼핑 (아이허점).</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>호텔로 복귀: <span class="text-gray-600 font-normal">우버/택시 3대 (약 10분)</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">13:00</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">2</span> 호텔 픽업 & 공항 출발</h3>
+                            <p class="text-sm text-gray-600 mt-1">맡겨둔 짐을 찾고 공항으로 이동.</p>
+                            <div class="mt-3 pt-3 border-t border-dashed border-gray-200">
+                                <p class="text-sm text-blue-600 font-semibold"><i class="fa-solid fa-arrow-right-long mr-2"></i>공항으로 이동: <span class="text-gray-600 font-normal">사전 예약된 9인승 밴 샌딩 이용</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex relative group">
+                        <div class="w-16 text-right mr-4 font-bold text-blue-600 shrink-0 pt-1">15:50</div>
+                        <div class="absolute left-[4.5rem] -ml-[5px] top-2 w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow"></div>
+                        <div class="bg-gray-50 rounded-xl p-4 flex-1 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-lg text-gray-900 flex items-center"><span class="marker-badge">3</span> 가오슝 국제공항</h3>
+                                <a href="https://www.google.com/maps/search/?api=1&query=Kaohsiung+International+Airport+No.+2,+Jhongshan+4th+Rd,+Siaogang+District,+Kaohsiung+City" target="_blank" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg text-xs"><i class="fa-solid fa-map-location-dot"></i> 구글지도</a>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">가오슝 공항 이륙 (19:45 인천 도착)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips & Checklist -->
+            <div id="tips" class="tab-content">
+                <div class="space-y-6">
+                    <div class="bg-blue-50 rounded-xl p-5 border border-blue-100 shadow-sm">
+                        <h3 class="font-bold text-lg text-blue-800 mb-3"><i class="fa-solid fa-van-shuttle mr-2"></i>9인 단체 교통 꿀팁</h3>
+                        <ul class="text-sm text-gray-700 space-y-2 leading-relaxed list-disc pl-4">
+                            <li>공항 ↔ 호텔, 호텔 ↔ 연지담: <strong>9인승 밴(包車) 사전 예약</strong> 추천.</li>
+                            <li>근거리 이동: <strong>택시 3대</strong>로 나누어 타거나 <strong>Uber XL + 일반 Uber</strong> 조합.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                        <h3 class="font-bold text-lg text-gray-900 mb-3"><i class="fa-solid fa-clipboard-check mr-2 text-green-500"></i>필수 준비물</h3>
+                        <div class="grid grid-cols-2 gap-3 text-sm text-gray-700">
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-500 w-4 h-4"><span>모기 기피제 (필수)</span></label>
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-500 w-4 h-4"><span>바람막이 (에어컨)</span></label>
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-500 w-4 h-4"><span>휴대용 선풍기</span></label>
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-500 w-4 h-4"><span>양산 & 모자</span></label>
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-500 w-4 h-4"><span>썬크림 & 선글라스</span></label>
+                            <label class="flex items-center space-x-2"><input type="checkbox" class="rounded text-blue-500 w-4 h-4"><span>비상약 & 소화제</span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Leaflet JS for Maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- JavaScript for Tabs & Maps -->
+    <script>
+        // 지도 인스턴스 저장 객체
+        const maps = {};
+
+        // 방문 장소별 위경도 좌표 데이터 (가오슝 기준)
+        const mapData = {
+            day1: [
+                { lat: 22.5746, lng: 120.3444, title: "가오슝 공항" },
+                { lat: 22.6314, lng: 120.3018, title: "호텔 체크인" },
+                { lat: 22.6288, lng: 120.2977, title: "희원천채소홀" },
+                { lat: 22.6254, lng: 120.2881, title: "아이허 유람선" },
+                { lat: 22.6325, lng: 120.3005, title: "리우허 야시장" }
+            ],
+            day2: [
+                { lat: 22.6198, lng: 120.2818, title: "보얼 예술 특구" },
+                { lat: 22.6186, lng: 120.2662, title: "영국 영사관" },
+                { lat: 22.6143, lng: 120.2690, title: "기후해산 (치진섬)" },
+                { lat: 22.6200, lng: 120.2705, title: "하이즈빙 빙수" },
+                { lat: 22.6146, lng: 120.3013, title: "후덕복" }
+            ],
+            day3: [
+                { lat: 22.6314, lng: 120.3018, title: "숙소 및 조식" },
+                { lat: 22.6806, lng: 120.2926, title: "연지담 (용호탑)" },
+                { lat: 22.6841, lng: 120.2965, title: "삼우 우육면" },
+                { lat: 22.6660, lng: 120.2996, title: "루이펑 야시장" }
+            ],
+            day4: [
+                { lat: 22.6300, lng: 120.2885, title: "까르푸 아이허점" },
+                { lat: 22.6314, lng: 120.3018, title: "호텔 픽업" },
+                { lat: 22.5746, lng: 120.3444, title: "가오슝 공항" }
+            ]
+        };
+
+        // 지도 생성 함수
+        function initMap(dayId) {
+            // 이미 생성된 지도가 있으면 크기만 재계산 (display:none 해결)
+            if (maps[dayId]) {
+                setTimeout(() => maps[dayId].invalidateSize(), 100);
+                return;
+            }
+
+            const coords = mapData[dayId];
+            if (!coords) return;
+
+            // 지도 객체 생성 및 기본 뷰 설정
+            const map = L.map(`map-${dayId}`).setView([coords[0].lat, coords[0].lng], 13);
+            maps[dayId] = map;
+
+            // OpenStreetMap 타일 레이어 추가
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // 좌표 배열 추출
+            const latlngs = coords.map(c => [c.lat, c.lng]);
+
+            // 이동 경로(실선) 그리기
+            L.polyline(latlngs, {
+                color: '#2563eb', 
+                weight: 4,
+                opacity: 0.8
+            }).addTo(map);
+
+            // 숫자 마커 추가
+            coords.forEach((coord, index) => {
+                const icon = L.divIcon({
+                    className: 'custom-number-marker',
+                    html: `${index + 1}`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+                
+                L.marker([coord.lat, coord.lng], {icon: icon})
+                 .bindPopup(`<b>${index + 1}. ${coord.title}</b>`)
+                 .addTo(map);
+            });
+
+            // 모든 마커가 보이도록 지도 영역 자동 조절
+            map.fitBounds(L.latLngBounds(latlngs), { padding: [30, 30] });
+        }
+
+        // 탭 전환 함수
+        function showTab(tabId, btnElement) {
+            // 모든 탭 컨텐츠 숨기기
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // 모든 탭 버튼 비활성화 스타일 적용
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'font-bold', 'text-blue-600', 'border-blue-600');
+                btn.classList.add('text-gray-500');
+            });
+            
+            // 선택된 탭 컨텐츠 보이기
+            document.getElementById(tabId).classList.add('active');
+            
+            // 버튼 활성화 스타일 적용
+            btnElement.classList.add('active', 'font-bold', 'text-blue-600', 'border-blue-600');
+            btnElement.classList.remove('text-gray-500');
+            
+            // 탭 중앙 스크롤
+            const nav = document.getElementById('tabs');
+            nav.scrollTo({
+                left: btnElement.offsetLeft - nav.offsetWidth / 2 + btnElement.offsetWidth / 2,
+                behavior: 'smooth'
+            });
+
+            // 지도 초기화 및 크기 업데이트 (탭이 변경될 때마다 호출)
+            if (tabId.startsWith('day')) {
+                initMap(tabId);
+            }
+        }
+
+        // 페이지 로드 시 첫 번째 날짜 지도 초기화
+        window.onload = () => {
+            initMap('day1');
+        };
+    </script>
+</body>
+</html>
